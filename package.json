@@ -1,0 +1,18 @@
+{
+  "name": "bond-bot-v2",
+  "version": "1.0.0",
+  "description": "Bot to improve returns on wonderland",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "npm test"
+  },
+  "author": "Tarzan",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.24.0",
+    "dotenv": "^10.0.0",
+    "ethers": "^5.5.1",
+    "express": "^4.17.1"
+  }
+}

@@ -21,7 +21,7 @@ let wallet = Wallet.fromMnemonic(process.env.MNEMONIC);
 wallet = wallet.connect(provider);
 
 const main = async () => {
-    const bondBotAddress = addresses.BOND_BOT_ADDRESS_2;
+    const bondBotAddress = addresses.BOND_BOT_ADDRESS_3;
     const bondBotContract = new ethers.Contract(bondBotAddress, BondBotContract, wallet);
     let memoAmount = await bondBotContract.getTokenBalance(addresses.MEMO_ADDRESS);
     console.log(memoAmount.toNumber())
@@ -45,7 +45,7 @@ const main = async () => {
         if (bondDiscount > trigger) {
             try {
                 let memoAmount = await bondBotContract.getTokenBalance(addresses.MEMO_ADDRESS);
-                let acceptedSlippage = 1/100;
+                let acceptedSlippage = 0.1/100;
                 if (memoAmount >= 500000000) {
                     if (bond.is_lp) {
                         [swapTarget, swapData, amount] = await zapinLpData(bond.lp_token_address, memoAmount, acceptedSlippage);
@@ -80,10 +80,10 @@ const main = async () => {
 const withdrawBalance = async () => {
     const bondBotContract = new ethers.Contract(addresses.BOND_BOT_ADDRESS_2, BondBotContract, wallet);
     let memoAmount = await bondBotContract.getTokenBalance(addresses.MEMO_ADDRESS);
-
-    console.log(memoAmount.toNumber())
-    await withdraw(bondBotContract ,memoAmount, wallet);
-
+    if (memoAmount > 0) {
+        console.log(memoAmount.toNumber())
+        await withdraw(bondBotContract ,memoAmount, wallet);
+    }
 }
 
 main();

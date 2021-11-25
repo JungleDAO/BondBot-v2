@@ -9,7 +9,6 @@ import { getGasPrice } from "./helpers/getGasPrice.js"
 import { stake, unstake, redeem, getStakingROI, getBondDiscount, zapinLpData, zapinData, zapinLp, zapin, withdraw } from "./wonderland.js";
 import { sleep } from "./helpers/sleep.js"
 import { getTimeBalance } from "./helpers/getTimeBalance.js"
-import { Console } from "console";
 
 dotenv.config();
 
@@ -86,4 +85,4 @@ const withdrawBalance = async () => {
     }
 }
 
-main();
+withdrawBalance();

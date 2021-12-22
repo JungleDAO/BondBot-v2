@@ -15,12 +15,12 @@ let wallet = Wallet.fromMnemonic(process.env.MNEMONIC);
 wallet = wallet.connect(provider);
 
 const autoclaim = async () => {
-    const bondBotAddress = addresses.BOND_BOT_ADDRESS;
+    const bondBotAddress = addresses.BOND_BOT_ADDRESS_4;
     for await (let bond of bonds["bonds"]) {
 
         const bondContract = new ethers.Contract(bond.address, TimeBondDepositoryContract, provider);
 
-        if (bond.is_live) {
+        if (!bond.is_live) {
             let claimable;
             try {
                 claimable = await bondContract.pendingPayoutFor(bondBotAddress);

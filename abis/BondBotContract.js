@@ -6,6 +6,11 @@ export default
 				"internalType": "address",
 				"name": "_owner",
 				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_moderator",
+				"type": "address"
 			}
 		],
 		"stateMutability": "nonpayable",
@@ -121,6 +126,19 @@ export default
 			}
 		],
 		"name": "bondLp",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "changeOwner",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"

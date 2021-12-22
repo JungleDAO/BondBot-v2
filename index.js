@@ -7,7 +7,6 @@ import * as fs from "fs";
 import * as dotenv from "dotenv";
 import { getGasPrice } from "./helpers/getGasPrice.js"
 import { stake, unstake, redeem, getStakingROI, getBondDiscount, zapinLpData, zapinData, zapinLp, zapin, withdraw } from "./wonderland.js";
-import { sleep } from "./helpers/sleep.js"
 import { getTimeBalance } from "./helpers/getTimeBalance.js"
 
 dotenv.config();
@@ -20,7 +19,7 @@ let wallet = Wallet.fromMnemonic(process.env.MNEMONIC);
 wallet = wallet.connect(provider);
 
 const main = async () => {
-    const bondBotAddress = addresses.BOND_BOT_ADDRESS_3;
+    const bondBotAddress = addresses.BOND_BOT_ADDRESS_4;
     const bondBotContract = new ethers.Contract(bondBotAddress, BondBotContract, wallet);
     let memoAmount = await bondBotContract.getTokenBalance(addresses.MEMO_ADDRESS);
     console.log(memoAmount.toNumber())
@@ -77,10 +76,11 @@ const main = async () => {
 
 
 const withdrawBalance = async () => {
-    const bondBotContract = new ethers.Contract(addresses.BOND_BOT_ADDRESS_2, BondBotContract, wallet);
-    let memoAmount = await bondBotContract.getTokenBalance(addresses.MEMO_ADDRESS);
+    const bondBotContract = new ethers.Contract(addresses.BOND_BOT_ADDRESS_4, BondBotContract, wallet);
+    // let memoAmount = await bondBotContract.getTokenBalance(addresses.MEMO_ADDRESS);
+    
+    let memoAmount = 10000000;
     if (memoAmount > 0) {
-        console.log(memoAmount.toNumber())
         await withdraw(bondBotContract ,memoAmount, wallet);
     }
 }

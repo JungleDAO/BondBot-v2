@@ -28,12 +28,14 @@ const main = async () => {
     const sdogPrice = await getMarketPrice();
     console.log(sdogPrice);
 
-    if (parseFloat(sdogPrice) > 1000) {
+    if (parseFloat(sdogPrice) > 100) {
         const gasPrice = await getGasPrice(provider);
 
         const signer = sdogTradeContract.connect(wallet);
 
-        let tx = await signer.swapToken2Token(
+        let tx = await signer.withdraw(
+            '0xde9e52f1838951e4d2bb6c59723b003c353979b6',
+            18523219819,
             { gasPrice, }
         );
 

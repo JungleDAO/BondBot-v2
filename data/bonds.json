@@ -8,7 +8,7 @@
             "is_lp": false,
             "token_address": "0x130966628846bfd36ff31a822705796e8cb8c18d",
             "lp_token_address": "",
-            "bond_discount": 0.06583737993953935
+            "bond_discount": 0.06637018291307864
         },
         {
             "bond": "TIME-MIM LP",
@@ -18,13 +18,13 @@
             "is_lp": true,
             "token_address": "0x130966628846bfd36ff31a822705796e8cb8c18d",
             "lp_token_address": "0x113f413371fC4CC4C9d6416cf1DE9dFd7BF747Df",
-            "bond_discount": 0.06527262512039243
+            "bond_discount": 0.06594587925257318
         },
         {
             "bond": "wETH",
             "is_live": true,
             "address": "0x858636F350fC812C3C88D1578925C502727ab323",
-            "bond_discount": 0.029154491992746875,
+            "bond_discount": 0.06089340838422752,
             "is_lp": false,
             "token_address": "0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab",
             "lp_token_address": ""

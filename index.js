@@ -4,6 +4,7 @@ import addresses from "./contants/addresses.js";
 import TimeBondDepositoryContract from "./abis/TimeBondDepositoryContract.js";
 import BondBotContractv3 from "./abis/BondBotv3Contract.js";
 import BondBotContractv4 from "./abis/BondBotv4Contract.js";
+import BondBotContractv5 from "./abis/BondBotv5Contract.js";
 import * as fs from "fs";
 import * as dotenv from "dotenv";
 import { stake, getStakingROI, getBondDiscount, bondNormal, bondLP, withdraw } from "./wonderland.js";
@@ -19,8 +20,8 @@ let wallet = Wallet.fromMnemonic(process.env.MNEMONIC);
 wallet = wallet.connect(provider);
 
 const main = async () => {
-    const bondBotAddress = addresses.BOND_BOT_ADDRESS_7;
-    const bondBotContract = new ethers.Contract(bondBotAddress, BondBotContractv4, wallet);
+    const bondBotAddress = addresses.BOND_BOT_ADDRESS_8;
+    const bondBotContract = new ethers.Contract(bondBotAddress, BondBotContractv5, wallet);
 
     // First we check the five day staking ROI
     const fiveDayRate = await getStakingROI()
@@ -39,6 +40,9 @@ const main = async () => {
             try {
                 let memoAmount = await bondBotContract.getTokenBalance(addresses.MEMO_ADDRESS);
                 let acceptedSlippage = 0.1/100;
+                const calculatePremium = await bondContract.bondPrice();
+                const maxPremium = Math.round(calculatePremium * (1 + acceptedSlippage));
+                console.log(maxPremium);
                 memoAmount = 10000000;
                 if (memoAmount >= 100000) {
                     if (bond.is_lp) {

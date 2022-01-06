@@ -2,11 +2,11 @@ import { ethers, utils, Wallet } from "ethers";
 import axios from "axios";
 import addresses from "./contants/addresses.js";
 import TimeBondDepositoryContract from "./abis/TimeBondDepositoryContract.js";
-import BondBotContract from "./abis/BondBotContract.js";
+import BondBotContractv3 from "./abis/BondBotv3Contract.js";
+import BondBotContractv4 from "./abis/BondBotv4Contract.js";
 import * as fs from "fs";
 import * as dotenv from "dotenv";
-import { getGasPrice } from "./helpers/getGasPrice.js"
-import { stake, unstake, redeem, getStakingROI, getBondDiscount, zapinLpData, zapinData, zapinLp, zapin, withdraw } from "./wonderland.js";
+import { stake, getStakingROI, getBondDiscount, bondNormal, bondLP, withdraw } from "./wonderland.js";
 import { getTimeBalance } from "./helpers/getTimeBalance.js"
 
 dotenv.config();
@@ -19,10 +19,8 @@ let wallet = Wallet.fromMnemonic(process.env.MNEMONIC);
 wallet = wallet.connect(provider);
 
 const main = async () => {
-    const bondBotAddress = addresses.BOND_BOT_ADDRESS_4;
-    const bondBotContract = new ethers.Contract(bondBotAddress, BondBotContract, wallet);
-    let memoAmount = await bondBotContract.getTokenBalance(addresses.MEMO_ADDRESS);
-    console.log(memoAmount.toNumber())
+    const bondBotAddress = addresses.BOND_BOT_ADDRESS_7;
+    const bondBotContract = new ethers.Contract(bondBotAddress, BondBotContractv4, wallet);
 
     // First we check the five day staking ROI
     const fiveDayRate = await getStakingROI()
@@ -30,30 +28,26 @@ const main = async () => {
 
     // Then we loop through each bond to see if there are any profitable bonds that beat 5 day staking
     for await (let bond of bonds["bonds"]) {
-
         const bondContract = new ethers.Contract(bond.address, TimeBondDepositoryContract, provider);
         let bondDiscount = await getBondDiscount(bondContract, bond);
 
         let trigger = (fiveDayRate * 0.06) + fiveDayRate;
-        let swapTarget = "";
-        let swapData = "";
-        let amount = "";
         
         // if bond it better than the staking ROI by 6%
-        if (bondDiscount > trigger) {
+        // if (bondDiscount > trigger) {
+        if (bond.bond == 'TIME-MIM LP') {
             try {
                 let memoAmount = await bondBotContract.getTokenBalance(addresses.MEMO_ADDRESS);
                 let acceptedSlippage = 0.1/100;
-                if (memoAmount >= 500000000) {
+                memoAmount = 10000000;
+                if (memoAmount >= 100000) {
                     if (bond.is_lp) {
-                        [swapTarget, swapData, amount] = await zapinLpData(bond.lp_token_address, memoAmount, acceptedSlippage);
-                        console.log(`Bonding ${ethers.utils.formatUnits(memoAmount, "gwei")} LP for ${bond.bond}`)
-                        await zapinLp(bondBotContract, bondContract, wallet, bond.address, memoAmount, amount, swapTarget, swapData, acceptedSlippage);
+                        console.log(`Bonding ${ethers.utils.formatUnits(memoAmount, "gwei")} for ${bond.bond}`)
+                        await bondLP(bondBotContract, bondContract, wallet, bond.address, bond.lp_token_address, addresses.TIME_ADDRESS, bond.token_address, memoAmount, acceptedSlippage);
                         bond.is_live = true;
                     } else {
-                        [swapTarget, swapData, amount] = await zapinData(bond.token_address, memoAmount, acceptedSlippage);
-                        console.log(`Bonding ${memoAmount} for ${bond.bond}`)
-                        await zapin(bondBotContract, bondContract, wallet, bond.address, memoAmount, amount, swapTarget, swapData, acceptedSlippage);   
+                        console.log(`Bonding ${ethers.utils.formatUnits(memoAmount, "gwei")} for ${bond.bond}`)
+                        await bondNormal(bondBotContract, bondContract, wallet, bond.address, addresses.TIME_ADDRESS, bond.token_address, memoAmount, acceptedSlippage);
                         bond.is_live = true;
                     }
                 }
@@ -76,13 +70,13 @@ const main = async () => {
 
 
 const withdrawBalance = async () => {
-    const bondBotContract = new ethers.Contract(addresses.BOND_BOT_ADDRESS_4, BondBotContract, wallet);
-    // let memoAmount = await bondBotContract.getTokenBalance(addresses.MEMO_ADDRESS);
+    const bondBotContract = new ethers.Contract(addresses.SDOG_TRADE_ADDRESS, BondBotContractv3, wallet);
+    let memoAmount = await bondBotContract.getTokenBalance(addresses.MEMO_ADDRESS);
     
-    let memoAmount = 10000000;
+    // let memoAmount = 10000000;
     if (memoAmount > 0) {
         await withdraw(bondBotContract ,memoAmount, wallet);
     }
 }
 
-withdrawBalance();
+main();

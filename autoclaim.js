@@ -15,7 +15,7 @@ let wallet = Wallet.fromMnemonic(process.env.MNEMONIC);
 wallet = wallet.connect(provider);
 
 const autoclaim = async () => {
-    const bondBotAddress = addresses.BOND_BOT_ADDRESS_4;
+    const bondBotAddress = addresses.SDOG_TRADE_ADDRESS;
     for await (let bond of bonds["bonds"]) {
 
         const bondContract = new ethers.Contract(bond.address, TimeBondDepositoryContract, provider);

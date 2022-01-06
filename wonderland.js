@@ -168,6 +168,7 @@ const zapin = async (bondBotContract, bondContract, wallet, bondAddress, memoAmo
         const calculatePremium = await bondContract.bondPrice();
         const maxPremium = Math.round(calculatePremium * (1 + acceptedSlippage));
         const gasPrice = await getGasPrice(provider);
+        console.log(maxPremium)
         
         const signer = bondBotContract.connect(wallet);
 
@@ -177,6 +178,61 @@ const zapin = async (bondBotContract, bondContract, wallet, bondAddress, memoAmo
             minAmount,
             swapTarget,
             swapData,
+            maxPremium,
+            { gasPrice, }
+        );
+
+        await tx.wait()
+        sleep(15)
+        console.log(tx);
+    }
+    catch (err) {
+        console.log(err)
+    }
+}
+
+const bondNormal = async (bondBotContract, bondContract, wallet, bondAddress, tokenIn, tokenOut, memoAmount, acceptedSlippage) => {
+
+    try {
+        const calculatePremium = await bondContract.bondPrice();
+        const maxPremium = Math.round(calculatePremium * (1 + acceptedSlippage));
+        const gasPrice = await getGasPrice(provider);
+
+        const signer = bondBotContract.connect(wallet);
+
+        let tx = await signer.bond(
+            bondAddress,
+            memoAmount,
+            tokenIn,
+            tokenOut,
+            maxPremium,
+            { gasPrice, }
+        );
+
+        await tx.wait()
+        sleep(15)
+        console.log(tx);
+    }
+    catch (err) {
+        console.log(err)
+    }
+}
+
+const bondLP = async (bondBotContract, bondContract, wallet, bondAddress, lpTokenAddress, tokenIn, tokenOut, memoAmount, acceptedSlippage) => {
+
+    try {
+        const calculatePremium = await bondContract.bondPrice();
+        const maxPremium = Math.round(calculatePremium * (1 + acceptedSlippage));
+        const gasPrice = await getGasPrice(provider);
+
+        const signer = bondBotContract.connect(wallet);
+
+        let tx = await signer.bondLp(
+            bondAddress,
+            lpTokenAddress,
+            tokenIn,
+            tokenOut,
+            memoAmount,
             maxPremium,
             { gasPrice, }
         );
@@ -212,4 +268,4 @@ const withdraw = async (bondBotContract, memoAmount, wallet) => {
     }
 }
 
-export { stake, unstake, redeem, getStakingROI, getBondDiscount, zapinLpData, zapinData, zapinLp, zapin, withdraw }
+export { stake, unstake, redeem, getStakingROI, getBondDiscount, zapinLpData, zapinData, zapinLp, zapin, bondNormal, bondLP, withdraw }

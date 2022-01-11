@@ -123,6 +123,8 @@ const bondNormal = async (bondBotContract, bondContract, wallet, bondAddress, to
             tokenIn,
             tokenOut,
             maxPremium,
+            true,
+            false,
             { gasPrice, }
         );
 

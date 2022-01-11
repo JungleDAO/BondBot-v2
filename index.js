@@ -10,7 +10,7 @@ import { klimaBonding } from "./processes/klimaBonding.js";
 import { timeBonding } from "./processes/timeBonding.js";
 
 const main = async () => {
-    // klimaBonding();
+    klimaBonding();
     timeBonding();
 }
 

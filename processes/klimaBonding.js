@@ -22,8 +22,7 @@ const klimaBonding = async () => {
 
     // First we check the five day staking ROI
     const fiveDayRate = await getStakingROI()
-    console.log(parseFloat(fiveDayRate) * 100)
-    console.log(`Staking 5-day ROI - ${(Number(fiveDayRate) * 100).toFixed(3)}%`)
+    console.log(`Klima Staking 5-day ROI - ${(Number(fiveDayRate) * 100).toFixed(3)}%`)
 
     // Then we loop through each bond to see if there are any profitable bonds that beat 5 day staking
     for await (let bond of bonds["bonds"]) {

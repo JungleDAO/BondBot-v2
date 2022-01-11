@@ -4,7 +4,8 @@ import StakingContract from "../abis/StakingContract.js";
 import StakingHelperContract from "../abis/StakingHelperContract.js";
 import MemoContract from "../abis/MemoContract.js";
 import JoeLPTokenContract from "../abis/JoeLPTokenContract.js";
-import { polyAddresses } from "../contants/addresses.js";
+import DistributorContract from "../abis/DistributorContract.js";
+import { polyAddresses, ESTIMATED_DAILY_REBASES } from "../contants/addresses.js";
 import { BigNumber } from "ethers";
 import { getGasPrice } from "../helpers/getGasPrice.js"
 import { sleep } from "../helpers/sleep.js";
@@ -68,24 +69,31 @@ const redeem = async (wallet, bondContract, adddress) => {
 }
 
 const getStakingROI = async () => {
+    const distributorContract = new ethers.Contract(polyAddresses.DISTRIBUTOR_ADDRESS, DistributorContract, provider);
     const sKlimaContract = new ethers.Contract(polyAddresses.SKLIMA_ADDRESS, MemoContract, provider);
     const stakingContract = new ethers.Contract(polyAddresses.STAKING_ADDRESS, StakingContract, provider);
-    const epoch = await stakingContract.epoch();
-    const stakingReward = epoch.distribute;
-    const circ = await sKlimaContract.circulatingSupply();
-    const stakingRebase = stakingReward / circ;
-    return Math.pow(1 + stakingRebase, 5 * 3) - 1;
+    const promises = [
+        distributorContract.info(0),
+        sKlimaContract.circulatingSupply(),
+      ];
+      const [info, circSupply] =
+        await Promise.all(promises);
+    const promises2 = [distributorContract.nextRewardAt(info.rate)];
+
+    const [stakingReward] = await Promise.all(promises2);
+    const stakingRebase = stakingReward / circSupply;
+    return Math.pow(1 + stakingRebase, 5 * ESTIMATED_DAILY_REBASES) - 1;
 }
 
 const getBondDiscount = async (bondContract, bond) => {
 
     let marketPrice = await getTokenPrice("klima-dao");
     const mimPrice = await getTokenPrice("magic-internet-money");
-    console.log(marketPrice);
+    // console.log(marketPrice);
     marketPrice = (marketPrice / Math.pow(10, 9)) * mimPrice;
 
     try {
-        // let bondPrice = await bondContract.bondPriceInUSD();
+        let bondPrice = await bondContract.bondPriceInUSD();
         // if (bond.bond === "TIME-AVAX LP") {
         //     const avaxPrice = await getTokenPrice("avalanche-2"); 
         //     bondPrice = bondPrice * avaxPrice;

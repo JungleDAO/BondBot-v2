@@ -1,9 +1,10 @@
 import { ethers, utils, Wallet } from "ethers";
-import addresses from "./contants/addresses.js";
+import { avaxAddresses } from "./contants/addresses.js";
+import BondBotContractv6 from "./abis/BondBotv6Contract.js";
 import TimeBondDepositoryContract from "./abis/TimeBondDepositoryContract.js";
 import * as fs from "fs";
 import * as dotenv from "dotenv";
-import { redeem} from "./wonderland.js";
+import { redeem} from "./protocols/wonderland.js";
 
 dotenv.config();
 
@@ -15,24 +16,21 @@ let wallet = Wallet.fromMnemonic(process.env.MNEMONIC);
 wallet = wallet.connect(provider);
 
 const autoclaim = async () => {
-    const bondBotAddress = addresses.SDOG_TRADE_ADDRESS;
+    const bondBotAddress = avaxAddresses.BOND_BOT_ADDRESS_9;
+    const bondBotContract = new ethers.Contract(bondBotAddress, BondBotContractv6, wallet);
     for await (let bond of bonds["bonds"]) {
-
-        const bondContract = new ethers.Contract(bond.address, TimeBondDepositoryContract, provider);
-
-        if (!bond.is_live) {
-            let claimable;
-            try {
-                claimable = await bondContract.pendingPayoutFor(bondBotAddress);
-                console.log(`${bond.bond} has ${ethers.utils.formatUnits(claimable, "gwei")} claimable rewards`);
-                if (claimable == 0) {
-                  bond.is_live = false;
-                } else {
-                    await redeem(wallet, bondContract, bondBotAddress);
-                }
-            } catch (e) {
-                console.log("error redeeming: ", e);
+    const bondContract = new ethers.Contract(bond.address, TimeBondDepositoryContract, provider);
+        let claimable;
+        try {
+            claimable = await bondContract.pendingPayoutFor(bondBotAddress);
+            console.log(`${bond.bond} has ${ethers.utils.formatUnits(claimable, "gwei")} claimable rewards`);
+            if (claimable == 0) {
+                bond.is_live = false;
+            } else {
+                await redeem(wallet, bondBotContract, bond.address);
             }
+        } catch (e) {
+            console.log("error redeeming: ", e);
         }
     }
     let data = JSON.stringify(bonds);

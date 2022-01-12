@@ -50,13 +50,29 @@ const unstake = async (wallet, memoAmount) => {
     }
 }
 
-const redeem = async (wallet, bondContract, adddress) => {
+const redeem = async (wallet, bondBotContract, bondAddress) => {
     try {
         const gasPrice = await getGasPrice(provider);
-        const signer = bondContract.connect(wallet);
-        let tx = await signer.redeem(
-            adddress,
-            true,
+        const signer = bondBotContract.connect(wallet);
+        let tx = await signer.autoClaim(
+            bondAddress,
+            { gasPrice, }
+        );
+        await tx.wait()
+        sleep(15)
+        console.log(tx);
+    }
+    catch (e) {
+        console.log(e);
+    }
+}
+
+const changeOwner = async (bondBotContract, newAddress, wallet) => {
+    try {
+        const gasPrice = await getGasPrice(provider);
+        const signer = bondBotContract.connect(wallet);
+        let tx = await signer.changeOwner(
+            newAddress,
             { gasPrice, }
         );
         await tx.wait()
@@ -108,7 +124,7 @@ const getTokenPrice = async (token) => {
     return data[token].usd
 }
 
-const bondNormal = async (bondBotContract, bondContract, wallet, bondAddress, tokenIn, tokenOut, memoAmount, acceptedSlippage) => {
+const bondNormal = async (bondBotContract, bondContract, wallet, bondAddress, tokenIn, tokenOut, memoAmount, isWeth, isSushi, acceptedSlippage) => {
 
     try {
         const calculatePremium = await bondContract.bondPrice();
@@ -123,8 +139,8 @@ const bondNormal = async (bondBotContract, bondContract, wallet, bondAddress, to
             tokenIn,
             tokenOut,
             maxPremium,
-            true,
-            false,
+            isWeth,
+            isSushi,
             { gasPrice, }
         );
 
@@ -137,7 +153,7 @@ const bondNormal = async (bondBotContract, bondContract, wallet, bondAddress, to
     }
 }
 
-const bondLP = async (bondBotContract, bondContract, wallet, bondAddress, lpTokenAddress, tokenIn, tokenOut, memoAmount, acceptedSlippage) => {
+const bondLP = async (bondBotContract, bondContract, wallet, bondAddress, lpTokenAddress, tokenIn, tokenOut, memoAmount, isSushi, isWmemo, acceptedSlippage) => {
 
     try {
         const calculatePremium = await bondContract.bondPrice();
@@ -153,6 +169,8 @@ const bondLP = async (bondBotContract, bondContract, wallet, bondAddress, lpToke
             tokenOut,
             memoAmount,
             maxPremium,
+            isSushi,
+            isWmemo,
             { gasPrice, }
         );
 
@@ -173,7 +191,7 @@ const withdraw = async (bondBotContract, memoAmount, wallet) => {
         const signer = bondBotContract.connect(wallet);
 
         let tx = await signer.withdraw(
-            addresses.MEMO_ADDRESS,
+            avaxAddresses.MEMO_ADDRESS,
             memoAmount,
             { gasPrice, }
         );
@@ -187,4 +205,4 @@ const withdraw = async (bondBotContract, memoAmount, wallet) => {
     }
 }
 
-export { stake, unstake, redeem, getStakingROI, getBondDiscount, bondNormal, bondLP, withdraw }
+export { stake, unstake, redeem, getStakingROI, getBondDiscount, bondNormal, bondLP, withdraw, changeOwner }

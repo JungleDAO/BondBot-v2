@@ -27,7 +27,7 @@ const autoclaim = async () => {
             if (claimable == 0) {
                 bond.is_live = false;
             } else {
-                await redeem(wallet, bondBotContract, bond.address);
+                // await redeem(wallet, bondContract, bond.address);
             }
         } catch (e) {
             console.log("error redeeming: ", e);

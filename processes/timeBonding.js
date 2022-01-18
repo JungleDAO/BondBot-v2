@@ -1,7 +1,7 @@
 import { ethers, Wallet } from "ethers";
 import { polyAddresses } from "../contants/addresses.js";
 import TimeBondDepositoryContract from "../abis/TimeBondDepositoryContract.js";
-import BondBotContractv6 from "../abis/BondBotv6Contract.js";
+import BondBotContractv6 from "../abis/BondBotv7Contract.js";
 import * as fs from "fs";
 import * as dotenv from "dotenv";
 import { stake, getStakingROI, getBondDiscount, bondNormal, bondLP, withdraw } from "../protocols/wonderland.js";
@@ -19,28 +19,29 @@ let wallet = Wallet.fromMnemonic(process.env.MNEMONIC);
 wallet = wallet.connect(provider);
 
 const timeBonding = async () => {
-    const bondBotAddress = avaxAddresses.BOND_BOT_ADDRESS_9;
+    const bondBotAddress = avaxAddresses.BOND_BOT_ADDRESS_10;
     const bondBotContract = new ethers.Contract(bondBotAddress, BondBotContractv6, wallet);
 
     // First we check the five day staking ROI
     const fiveDayRate = await getStakingROI()
     console.log(`Wonderland Staking 5-day ROI - ${(Number(fiveDayRate) * 100).toFixed(3)}%`)
-
+    let memoAmount = await bondBotContract.getTokenBalance(avaxAddresses.MEMO_ADDRESS);
+    console.log(memoAmount.toNumber());
     // Then we loop through each bond to see if there are any profitable bonds that beat 5 day staking
     for await (let bond of bonds["bonds"]) {
         const bondContract = new ethers.Contract(bond.address, TimeBondDepositoryContract, provider);
         let bondDiscount = await getBondDiscount(bondContract, bond);
 
         let trigger = (fiveDayRate * 0.06) + fiveDayRate;
-        
+        let memoAmount = await bondBotContract.getTokenBalance(avaxAddresses.MEMO_ADDRESS);
         // if bond it better than the staking ROI by 6%
         // if (bondDiscount > trigger) {
-        if (bond.bond == 'MIM') {
+        if (bond.bond == 'WMEMO-MIM LP') {
             try {
                 let memoAmount = await bondBotContract.getTokenBalance(avaxAddresses.MEMO_ADDRESS);
                 let acceptedSlippage = 0.1/100;
-                memoAmount = 10000000;
-                if (memoAmount >= 10000000) {
+                memoAmount = 30000000;
+                if (memoAmount >= 30000000) {
                     if (bond.is_lp) {
                         let tokenA = avaxAddresses.TIME_ADDRESS;
                         if (bond.bond == "WMEMO-MIM LP") {

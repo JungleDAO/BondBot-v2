@@ -67,6 +67,24 @@ const redeem = async (wallet, bondBotContract, bondAddress) => {
     }
 }
 
+const redeem_old = async (wallet, bondContract, adddress) => {
+    try {
+        const gasPrice = await getGasPrice(provider);
+        const signer = bondContract.connect(wallet);
+        let tx = await signer.redeem(
+            adddress,
+            true,
+            { gasPrice, }
+        );
+        await tx.wait()
+        sleep(15)
+        console.log(tx);
+    }
+    catch (e) {
+        console.log(e);
+    }
+}
+
 const changeOwner = async (bondBotContract, newAddress, wallet) => {
     try {
         const gasPrice = await getGasPrice(provider);

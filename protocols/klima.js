@@ -122,8 +122,9 @@ const bondNormal = async (bondBotContract, bondContract, wallet, bondAddress, to
     try {
         const calculatePremium = await bondContract.bondPrice();
         const maxPremium = Math.round(calculatePremium * (1 + acceptedSlippage));
-        const gasPrice = await getGasPrice(provider);
-
+        let gp = await getGasPrice(provider);
+        gp = gp * 10;
+        let gasPrice = BigNumber.from(gp);
         const signer = bondBotContract.connect(wallet);
 
         let tx = await signer.bond(
@@ -144,7 +145,7 @@ const bondNormal = async (bondBotContract, bondContract, wallet, bondAddress, to
     }
 }
 
-const bondLP = async (bondBotContract, bondContract, wallet, bondAddress, lpTokenAddress, tokenIn, tokenOut, memoAmount, acceptedSlippage) => {
+const bondLP = async (bondBotContract, bondContract, wallet, bondAddress, lpTokenAddress, tokenIn, tokenOut, memoAmount, isDoubleSwap, acceptedSlippage) => {
 
     try {
         const calculatePremium = await bondContract.bondPrice();
@@ -160,6 +161,8 @@ const bondLP = async (bondBotContract, bondContract, wallet, bondAddress, lpToke
             tokenOut,
             memoAmount,
             maxPremium,
+            isDoubleSwap,
+            false,
             { gasPrice, }
         );
 

@@ -5,17 +5,17 @@ import StakingHelperContract from "../abis/StakingHelperContract.js";
 import MemoContract from "../abis/MemoContract.js";
 import JoeLPTokenContract from "../abis/JoeLPTokenContract.js";
 import DistributorContract from "../abis/DistributorContract.js";
-import { polyAddresses, ESTIMATED_DAILY_REBASES } from "../contants/addresses.js";
+import { romeAddresses, ESTIMATED_DAILY_REBASES_ROME } from "../contants/addresses.js";
 import { BigNumber } from "ethers";
 import { getGasPrice } from "../helpers/getGasPrice.js"
 import { sleep } from "../helpers/sleep.js";
 
-const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com')
+const provider = new ethers.providers.JsonRpcProvider('https://rpc.moonriver.moonbeam.network')
 
 const stake = async (wallet, amount, address) => {
     try {
         console.log("Staking Klima")
-        const stakingHelper = new ethers.Contract(polyAddresses.STAKING_HELPER, StakingHelperContract, wallet);
+        const stakingHelper = new ethers.Contract(romeAddresses.STAKING_HELPER, StakingHelperContract, wallet);
 
         let stakingtx = stakingHelper.stake(amount, address);
         
@@ -34,7 +34,7 @@ const stake = async (wallet, amount, address) => {
 const unstake = async (wallet, memoAmount) => {
     try {
         console.log("Unstaking sKlima")
-        const staking = new ethers.Contract(polyAddresses.STAKING_ADDRESS, StakingContract, wallet);
+        const staking = new ethers.Contract(romeAddresses.STAKING_ADDRESS, StakingContract, wallet);
 
         let unstakingtx = staking.unstake(memoAmount, true);
         
@@ -68,10 +68,19 @@ const redeem = async (wallet, bondContract, adddress) => {
     }
 }
 
+const getStakingROI1 = async () => {
+    const memoContract = new ethers.Contract(romeAddresses.SROME_ADDDRESS, MemoContract, provider);
+    const stakingContract = new ethers.Contract(romeAddresses.STAKING_ADDRESS, StakingContract, provider);
+    const epoch = await stakingContract.epoch();
+    const stakingReward = epoch.distribute;
+    const circ = await memoContract.circulatingSupply();
+    const stakingRebase = stakingReward / circ;
+    return Math.pow(1 + stakingRebase, 5 * 3) - 1;
+}
+
 const getStakingROI = async () => {
-    const distributorContract = new ethers.Contract(polyAddresses.DISTRIBUTOR_ADDRESS, DistributorContract, provider);
-    const sKlimaContract = new ethers.Contract(polyAddresses.SKLIMA_ADDRESS, MemoContract, provider);
-    const stakingContract = new ethers.Contract(polyAddresses.STAKING_ADDRESS, StakingContract, provider);
+    const distributorContract = new ethers.Contract(romeAddresses.DISTRIBUTOR_ADDRESS, DistributorContract, provider);
+    const sKlimaContract = new ethers.Contract(romeAddresses.SROME_ADDDRESS, MemoContract, provider);
     const promises = [
         distributorContract.info(0),
         sKlimaContract.circulatingSupply(),
@@ -82,7 +91,7 @@ const getStakingROI = async () => {
 
     const [stakingReward] = await Promise.all(promises2);
     const stakingRebase = stakingReward / circSupply;
-    return Math.pow(1 + stakingRebase, 5 * ESTIMATED_DAILY_REBASES) - 1;
+    return Math.pow(1 + stakingRebase, 5 * ESTIMATED_DAILY_REBASES_ROME) - 1;
 }
 
 const getBondDiscount = async (bondContract, bond) => {

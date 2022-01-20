@@ -12,7 +12,7 @@ dotenv.config();
 let data = fs.readFileSync("./data/klimaBonds.json")
 let bonds = JSON.parse(data)
 
-const provider = new ethers.providers.JsonRpcProvider('https://matic-mainnet.chainstacklabs.com')
+const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com')
 let wallet = Wallet.fromMnemonic(process.env.KLIMA_MNEMONIC);
 wallet = wallet.connect(provider);
 

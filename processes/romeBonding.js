@@ -1,30 +1,30 @@
 import { ethers, Wallet } from "ethers";
-import { polyAddresses } from "../contants/addresses.js";
+import { romeAddresses } from "../contants/addresses.js";
 import TimeBondDepositoryContract from "../abis/TimeBondDepositoryContract.js";
-import PolyBondBot from "../abis/PolyBondBotv3.js";
+import RomeBondBot from "../abis/RomeBondBotContract.js";
 import * as fs from "fs";
 import * as dotenv from "dotenv";
-import { stake, getStakingROI, getBondDiscount, bondNormal, bondLP, withdraw } from "../protocols/klima.js";
+import { stake, getStakingROI, getBondDiscount, bondNormal, bondLP, withdraw } from "../protocols/rome.js";
 // import { getTimeBalance } from "../helpers/getTimeBalance.js"
 
 dotenv.config();
 
-let data = fs.readFileSync("./data/klimaBonds.json")
+let data = fs.readFileSync("./data/romeBonds.json")
 let bonds = JSON.parse(data)
 
 const provider = new ethers.providers.JsonRpcProvider('https://rpc.moonriver.moonbeam.network')
-let wallet = Wallet.fromMnemonic(process.env.KLIMA_MNEMONIC);
+let wallet = Wallet.fromMnemonic(process.env.MOONRIVER_MNEMONIC);
 wallet = wallet.connect(provider);
 
-const klimaBonding = async () => {
-    const bondBotAddress = polyAddresses.BOND_BOT_ADDRESS_5;
-    const bondBotContract = new ethers.Contract(bondBotAddress, PolyBondBot, wallet);
+const romeBonding = async () => {
+    const bondBotAddress = romeAddresses.BOND_BOT_ADDRESS;
+    const bondBotContract = new ethers.Contract(bondBotAddress, RomeBondBot, wallet);
 
     // First we check the five day staking ROI
     const fiveDayRate = await getStakingROI()
-    console.log(`Klima Staking 5-day ROI - ${(Number(fiveDayRate) * 100).toFixed(3)}%`)
+    console.log(`Rome Staking 5-day ROI - ${(Number(fiveDayRate) * 100).toFixed(3)}%`)
 
-    // Then we loop through each bond to see if there are any profitable bonds that beat 5 day staking
+    // // Then we loop through each bond to see if there are any profitable bonds that beat 5 day staking
     for await (let bond of bonds["bonds"]) {
         const bondContract = new ethers.Contract(bond.address, TimeBondDepositoryContract, provider);
         let bondDiscount = await getBondDiscount(bondContract, bond);
@@ -34,23 +34,17 @@ const klimaBonding = async () => {
         // if (bondDiscount > trigger) {
         if (bond.bond == 'BCT') {
             try {
-                let sKlimaAmount = await bondBotContract.getTokenBalance(polyAddresses.SKLIMA_ADDRESS);
+                let sKlimaAmount = await bondBotContract.getTokenBalance(romeAddresses.SROME_ADDDRESS);
                 let acceptedSlippage = 1/100;
-                if (sKlimaAmount >= 300000000) {
-                    sKlimaAmount = 300000000;
+                if (sRomeAmount >= 300000000) {
+                    sRomeAmount = 300000000;
                     if (bond.is_lp) {
-                        let isDoubleSwap = false;
-                        let tokenA = polyAddresses.KLIMA_ADDRESS;
-                        if (bond.bond == 'BCT/USDC LP') {
-                            isDoubleSwap = true;
-                            tokenA = polyAddresses.BCT_ADDRESS;
-                        }
                         console.log(`Bonding ${ethers.utils.formatUnits(sKlimaAmount, "gwei")} for ${bond.bond}`)
-                        await bondLP(bondBotContract, bondContract, wallet, bond.address, bond.lp_token_address, tokenA, bond.token_address, sKlimaAmount, isDoubleSwap, acceptedSlippage);
+                        await bondLP(bondBotContract, bondContract, wallet, bond.address, bond.lp_token_address, romeAddresses.ROME_ADDRESS, bond.token_address, sRomeAmount, isDoubleSwap, acceptedSlippage);
                         bond.is_live = true;
                     } else {
                         console.log(`Bonding ${ethers.utils.formatUnits(sKlimaAmount, "gwei")} for ${bond.bond}`)
-                        await bondNormal(bondBotContract, bondContract, wallet, bond.address, polyAddresses.KLIMA_ADDRESS, bond.token_address, sKlimaAmount, acceptedSlippage);
+                        await bondNormal(bondBotContract, bondContract, wallet, bond.address, romeAddresses.ROME_ADDRESS, bond.token_address, sRomeAmount, acceptedSlippage);
                         bond.is_live = true;
                     }
                 }
@@ -68,7 +62,7 @@ const klimaBonding = async () => {
     // }
 
     let data = JSON.stringify(bonds);
-    fs.writeFileSync("./data/klimaBonds.json", data);
+    fs.writeFileSync("./data/romeBonds.json", data);
 }
 
-export { klimaBonding }
+export { romeBonding }

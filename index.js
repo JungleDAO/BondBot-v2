@@ -9,6 +9,7 @@ import { withdraw, changeOwner } from "./protocols/wonderland.js";
 // import { getTimeBalance } from "./helpers/getTimeBalance.js";
 import { klimaBonding } from "./processes/klimaBonding.js";
 import { timeBonding } from "./processes/timeBonding.js";
+import { romeBonding } from "./processes/romeBonding.js";
 
 dotenv.config();
 
@@ -21,8 +22,9 @@ wallet = wallet.connect(provider);
 // wallet = wallet.connect(provider);
 
 const main = async () => {
-    klimaBonding();
+    // klimaBonding();
     // timeBonding();
+    romeBonding();
 }
 
 

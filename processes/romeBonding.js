@@ -1,5 +1,5 @@
 import { ethers, Wallet } from "ethers";
-import { romeAddresses } from "../contants/addresses.js";
+import { romeAddresses, ZERO_ADDRESS } from "../contants/addresses.js";
 import TimeBondDepositoryContract from "../abis/TimeBondDepositoryContract.js";
 import RomeBondBot from "../abis/RomeBondBotContract.js";
 import * as fs from "fs";
@@ -17,7 +17,7 @@ let wallet = Wallet.fromMnemonic(process.env.MOONRIVER_MNEMONIC);
 wallet = wallet.connect(provider);
 
 const romeBonding = async () => {
-    const bondBotAddress = romeAddresses.BOND_BOT_ADDRESS;
+    const bondBotAddress = romeAddresses.BOND_BOT_ADDRESS_1;
     const bondBotContract = new ethers.Contract(bondBotAddress, RomeBondBot, wallet);
 
     // First we check the five day staking ROI
@@ -32,19 +32,23 @@ const romeBonding = async () => {
 
         // if bond it better than the staking ROI by 6%
         // if (bondDiscount > trigger) {
-        if (bond.bond == 'BCT') {
+        if (bond.bond == 'FRAX') {
             try {
-                let sKlimaAmount = await bondBotContract.getTokenBalance(romeAddresses.SROME_ADDDRESS);
+                let sRomeAmount = await bondBotContract.getTokenBalance(romeAddresses.SROME_ADDDRESS);
                 let acceptedSlippage = 1/100;
-                if (sRomeAmount >= 300000000) {
-                    sRomeAmount = 300000000;
+                if (sRomeAmount >= 100000000) {
+                    sRomeAmount = 100000000;
                     if (bond.is_lp) {
-                        console.log(`Bonding ${ethers.utils.formatUnits(sKlimaAmount, "gwei")} for ${bond.bond}`)
-                        await bondLP(bondBotContract, bondContract, wallet, bond.address, bond.lp_token_address, romeAddresses.ROME_ADDRESS, bond.token_address, sRomeAmount, isDoubleSwap, acceptedSlippage);
+                        console.log(`Bonding ${ethers.utils.formatUnits(sRomeAmount, "gwei")} for ${bond.bond}`)
+                        await bondLP(bondBotContract, bondContract, wallet, bond.address, bond.lp_token_address, romeAddresses.ROME_ADDRESS, bond.token_address, sRomeAmount, acceptedSlippage);
                         bond.is_live = true;
                     } else {
-                        console.log(`Bonding ${ethers.utils.formatUnits(sKlimaAmount, "gwei")} for ${bond.bond}`)
-                        await bondNormal(bondBotContract, bondContract, wallet, bond.address, romeAddresses.ROME_ADDRESS, bond.token_address, sRomeAmount, acceptedSlippage);
+                        console.log(`Bonding ${ethers.utils.formatUnits(sRomeAmount, "gwei")} for ${bond.bond}`)
+                        let extraToken = ZERO_ADDRESS;
+                        if (bond.isMultiPath) {
+
+                        }
+                        await bondNormal(bondBotContract, bondContract, wallet, bond.address, romeAddresses.ROME_ADDRESS, bond.token_address, extraToken, sRomeAmount, acceptedSlippage);
                         bond.is_live = true;
                     }
                 }

@@ -1,1 +1,49 @@
-{"bonds":[{"bond":"FRAX","is_live":true,"address":"0xE2F71c68db7ECC0c9A907AD2E40E2394c5CAc367","bond_price":0.055961083951199565,"is_lp":false,"token_address":"0x1A93B23281CC1CDE4C4741353F3064709A16197d","lp_token_address":"","bond_discount":-0.999999999335409,"isMultiPath":false},{"bond":"ROME/FRAX LP","is_live":true,"address":"0x065588602bd7206B15f9630FDB2e81E4Ca51ad8A","bond_price":0.06862405766668703,"is_lp":true,"token_address":"0x1A93B23281CC1CDE4C4741353F3064709A16197d","lp_token_address":"0x069C2065100b4D3D982383f7Ef3EcD1b95C05894","bond_discount":-0.9999999992964919,"isMultiPath":false}],"old_bonds":[{"bond":"MIM","is_live":true,"address":"0x91a5184741FDc64f7507A7db6Aa3764a747f8089","bond_price":0.055961083951199565,"is_lp":false,"token_address":"0x3bF21Ce864e58731B6f28D68d5928BcBEb0Ad172","lp_token_address":"","bond_discount":-0.9999999937753686,"isMultiPath":true},{"bond":"gOHM","is_live":true,"address":"0xC82d354Cc96b5Cd0ee5B63569b5b51a2D3c5a895","bond_price":0.055961083951199565,"is_lp":false,"token_address":"0x3bF21Ce864e58731B6f28D68d5928BcBEb0Ad172","lp_token_address":"","bond_discount":-0.9999999937753686}]}
+{
+    "bonds": [
+        {
+            "bond": "FRAX",
+            "is_live": true,
+            "address": "0xE2F71c68db7ECC0c9A907AD2E40E2394c5CAc367",
+            "bond_price": 0.055961083951199565,
+            "is_lp": false,
+            "token_address": "0x1A93B23281CC1CDE4C4741353F3064709A16197d",
+            "lp_token_address": "",
+            "bond_discount": -0.9999999993307409,
+            "isMultiPath": false
+        },
+        {
+            "bond": "ROME/FRAX LP",
+            "is_live": false,
+            "address": "0x065588602bd7206B15f9630FDB2e81E4Ca51ad8A",
+            "bond_price": 0.06862405766668703,
+            "is_lp": true,
+            "token_address": "0x1A93B23281CC1CDE4C4741353F3064709A16197d",
+            "lp_token_address": "0x069C2065100b4D3D982383f7Ef3EcD1b95C05894",
+            "bond_discount": -0.9999999992904001,
+            "isMultiPath": false
+        }
+    ],
+    "old_bonds": [
+        {
+            "bond": "MIM",
+            "is_live": true,
+            "address": "0x91a5184741FDc64f7507A7db6Aa3764a747f8089",
+            "bond_price": 0.055961083951199565,
+            "is_lp": false,
+            "token_address": "0x3bF21Ce864e58731B6f28D68d5928BcBEb0Ad172",
+            "lp_token_address": "",
+            "bond_discount": -0.9999999937753686,
+            "isMultiPath": true
+        },
+        {
+            "bond": "gOHM",
+            "is_live": true,
+            "address": "0xC82d354Cc96b5Cd0ee5B63569b5b51a2D3c5a895",
+            "bond_price": 0.055961083951199565,
+            "is_lp": false,
+            "token_address": "0x3bF21Ce864e58731B6f28D68d5928BcBEb0Ad172",
+            "lp_token_address": "",
+            "bond_discount": -0.9999999937753686
+        }
+    ]
+}

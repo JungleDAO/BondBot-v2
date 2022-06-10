@@ -3,6 +3,7 @@ import axios from "axios";
 import StakingContract from "../abis/StakingContract.js";
 import StakingHelperContract from "../abis/StakingHelperContract.js";
 import MemoContract from "../abis/MemoContract.js";
+import ERC20 from "../abis/ERC20.js";
 import JoeLPTokenContract from "../abis/JoeLPTokenContract.js";
 import DistributorContract from "../abis/DistributorContract.js";
 import { polyAddresses, ESTIMATED_DAILY_REBASES } from "../contants/addresses.js";
@@ -10,7 +11,7 @@ import { BigNumber } from "ethers";
 import { getGasPrice } from "../helpers/getGasPrice.js"
 import { sleep } from "../helpers/sleep.js";
 
-const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com')
+const provider = new ethers.providers.JsonRpcProvider('https://polygon-rpc.com/')
 
 const stake = async (wallet, amount, address) => {
     try {
@@ -70,7 +71,7 @@ const redeem = async (wallet, bondContract, adddress) => {
 
 const getStakingROI = async () => {
     const distributorContract = new ethers.Contract(polyAddresses.DISTRIBUTOR_ADDRESS, DistributorContract, provider);
-    const sKlimaContract = new ethers.Contract(polyAddresses.SKLIMA_ADDRESS, MemoContract, provider);
+    const sKlimaContract = new ethers.Contract(polyAddresses.SKLIMA_ADDRESS, ERC20, provider);
     const stakingContract = new ethers.Contract(polyAddresses.STAKING_ADDRESS, StakingContract, provider);
     const promises = [
         distributorContract.info(0),

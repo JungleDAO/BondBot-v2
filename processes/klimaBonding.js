@@ -36,8 +36,8 @@ const klimaBonding = async () => {
             try {
                 let sKlimaAmount = await bondBotContract.getTokenBalance(polyAddresses.SKLIMA_ADDRESS);
                 let acceptedSlippage = 1/100;
-                if (sKlimaAmount >= 300000000) {
-                    sKlimaAmount = 300000000;
+                if (sKlimaAmount >= 500000000) {
+                    sKlimaAmount = 500000000;
                     if (bond.is_lp) {
                         let isDoubleSwap = false;
                         let tokenA = polyAddresses.KLIMA_ADDRESS;
